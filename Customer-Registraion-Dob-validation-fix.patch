@@ -1,0 +1,69 @@
+From d40c488b2fc32162a70eb159e55ceb008e7c58b6 Mon Sep 17 00:00:00 2001
+From: chandu <chandravadana.kandregula@pinpointdesigns.co.uk>
+Date: Thu, 11 Jun 2020 10:46:56 +0100
+Subject: [PATCH] DOB field validation updated
+
+---
+ .../Magento/Customer/view/frontend/web/js/validation.js   | 8 ++++++--
+ lib/web/mage/validation.js                                | 6 +++---
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/app/code/Magento/Customer/view/frontend/web/js/validation.js b/app/code/Magento/Customer/view/frontend/web/js/validation.js
+index 67a71421202..17e653aefd1 100644
+--- a/app/code/Magento/Customer/view/frontend/web/js/validation.js
++++ b/app/code/Magento/Customer/view/frontend/web/js/validation.js
+@@ -1,9 +1,10 @@
+ define([
+     'jquery',
+     'moment',
++    'mageUtils',
+     'jquery/validate',
+     'mage/translate'
+-], function ($, moment) {
++], function ($, moment, utils) {
+     'use strict';
+ 
+     $.validator.addMethod(
+@@ -12,8 +13,11 @@ define([
+             if (value === '') {
+                 return true;
+             }
++            var valueFormatted,
++                inputFormat = 'd/M/yy';
+ 
+-            return moment(value).isBefore(moment());
++            valueFormatted = moment(value, utils.convertToMomentFormat(inputFormat));
++            return valueFormatted.isBefore(moment());
+         },
+         $.mage.__('The Date of Birth should not be greater than today.')
+     );
+diff --git a/lib/web/mage/validation.js b/lib/web/mage/validation.js
+index 51c23a9b28c..fd8855ce214 100644
+--- a/lib/web/mage/validation.js
++++ b/lib/web/mage/validation.js
+@@ -6,10 +6,11 @@
+ define([
+     'jquery',
+     'moment',
++    'mageUtils',
+     'jquery-ui-modules/widget',
+     'jquery/validate',
+     'mage/translate'
+-], function ($, moment) {
++], function ($, moment, utils) {
+     'use strict';
+ 
+     var creditCartTypes, rules, showLabel, originValidateDelegate;
+@@ -1032,8 +1033,7 @@ define([
+         ],
+         'validate-date': [
+             function (value, params, additionalParams) {
+-                var test = moment(value, additionalParams.dateFormat);
+-
++                var test = moment(value, utils.convertToMomentFormat(additionalParams.dateFormat));
+                 return $.mage.isEmptyNoTrim(value) || test.isValid();
+             },
+             $.mage.__('Please enter a valid date.')
+-- 
+2.23.0
+
